@@ -1,0 +1,23 @@
+{
+  "references": [
+    {
+      "path": "packages/core/src/library"
+    },
+    {
+      "path": "packages/core/src/test"
+    },
+    {
+      "path": "packages/server/src/program"
+    },
+    {
+      "path": "packages/server/src/test"
+    },
+    {
+      "path": "packages/web/src/program"
+    },
+    {
+      "path": "packages/web/src/test"
+    }
+  ],
+  "files": []
+}

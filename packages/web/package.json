@@ -1,0 +1,9 @@
+{
+  "name": "@duck-user/web",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "boenfu",
+  "dependencies": {
+    "tslib": "^2.3.1"
+  }
+}
