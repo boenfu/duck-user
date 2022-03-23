@@ -3,5 +3,10 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "../../bld/program"
-  }
+  },
+  "references": [
+    {
+      "path": "../../../core/src/library"
+    }
+  ]
 }
