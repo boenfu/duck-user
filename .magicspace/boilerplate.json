@@ -1,0 +1,43 @@
+{
+  "extends": "@mufan/code-boilerplates/typescript",
+  "options": {
+    "name": "duck-user",
+    "license": "MIT",
+    "author": "boenfu",
+    "packages": [
+      {
+        "name": "@duck-user/core",
+        "tsProjects": [
+          {
+            "name": "library"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@duck-user/server",
+        "tsProjects": [
+          {
+            "name": "program"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      },
+      {
+        "name": "@duck-user/web",
+        "tsProjects": [
+          {
+            "name": "program"
+          },
+          {
+            "name": "test"
+          }
+        ]
+      }
+    ]
+  }
+}
