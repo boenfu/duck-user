@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "boenfu",
   "dependencies": {
+    "@duck-user/core": "*",
     "tslib": "^2.3.1"
   }
 }

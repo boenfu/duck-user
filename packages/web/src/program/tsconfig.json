@@ -4,5 +4,10 @@
     "composite": true,
     "lib": ["DOM", "ESNext"],
     "outDir": "../../bld/program"
-  }
+  },
+  "references": [
+    {
+      "path": "../../../core/src/library"
+    }
+  ]
 }
