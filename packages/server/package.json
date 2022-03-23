@@ -3,7 +3,23 @@
   "version": "0.0.0",
   "license": "MIT",
   "author": "boenfu",
+  "scripts": {
+    "test-run": "nodemand ./bld/test/index.js"
+  },
   "dependencies": {
+    "@koa/cors": "^3.2.0",
+    "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.7",
+    "@types/koa-router": "^7.4.4",
+    "@types/koa__cors": "^3.1.1",
+    "@types/request-ip": "^0.0.37",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.1.1",
+    "request-ip": "^2.1.3",
     "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "nodemand": "^0.1.11"
   }
 }
