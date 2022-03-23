@@ -31,7 +31,13 @@
         "name": "@duck-user/web",
         "tsProjects": [
           {
-            "name": "program"
+            "name": "program",
+            "references": [
+              {
+                "package": "@duck-user/core",
+                "project": "library"
+              }
+            ]
           },
           {
             "name": "test"
