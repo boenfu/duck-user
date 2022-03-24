@@ -7,7 +7,8 @@
     "build": "rimraf packages/*/bld && tsc --build",
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
-    "test": "yarn lint-prettier && yarn build && yarn lint"
+    "test": "yarn lint-prettier && yarn build && yarn lint",
+    "server": "yarn workspace @duck-user/server"
   },
   "workspaces": [
     "packages/core",

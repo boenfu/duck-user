@@ -1,5 +1,7 @@
+import {Duck, DuckAppearance} from '../duck';
+
 export interface INest {
-  enter(): void;
-  peek(): void;
-  leave(): void;
+  bring(duck: Duck): Promise<void> | void;
+  take(appearance: DuckAppearance): Promise<Duck> | Duck;
+  bury(duck: Duck): Promise<void> | void;
 }

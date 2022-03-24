@@ -1,15 +1,17 @@
+import {Duck, DuckAppearance} from '../duck';
+
 import {INest} from './nest';
 
 export class MemoryNest implements INest {
-  enter(): void {
+  bring(duck: Duck): void | Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  peek(): void {
+  take(appearance: DuckAppearance): Duck | Promise<Duck> {
     throw new Error('Method not implemented.');
   }
 
-  leave(): void {
+  bury(duck: Duck): void | Promise<void> {
     throw new Error('Method not implemented.');
   }
 }

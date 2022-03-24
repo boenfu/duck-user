@@ -12,7 +12,7 @@ export const DUCK_USER_PORT_DEFAULT = 3000;
 
 export type DuckUserVerifier = (nextKey: string) => Promise<boolean> | boolean;
 
-export interface DuckUserOptions {
+export interface DuckUserServerOptions {
   serve?: {
     httpServer?: HTTPServer;
     koa?: Koa;
@@ -21,18 +21,14 @@ export interface DuckUserOptions {
   };
   nest?: INest;
   /**
-   * default: false
-   * If true, will not ignore undefined source when compare.
-   */
-  strict?: boolean;
-  /**
    * (ms)
    */
-  userLifeCycle?: number;
+  defaultLifespan?: number;
 }
 
 interface ContextWithParams {
-  realIp: string | null;
+  kinds: object;
+  identifier: string[];
 }
 
 export class DuckUserServer {
@@ -50,14 +46,10 @@ export class DuckUserServer {
       verifier,
     } = {},
     nest = new MemoryNest(),
-  }: DuckUserOptions = {}) {
+  }: DuckUserServerOptions = {}) {
     let router = this.router;
 
-    router.all('/enter', ctx => {
-      ctx.body = '1';
-    });
-
-    app.use(cors()).use(body()).use(realIp());
+    app.use(cors()).use(body()).use(nestGate());
 
     if (verifier !== undefined) {
       app.use(auth(verifier));
@@ -77,20 +69,19 @@ export class DuckUserServer {
   }
 }
 
-function auth(verifierOrDuckUserKey: string | DuckUserVerifier): Middleware {
+function auth(verifierOrToken: string | DuckUserVerifier): Middleware {
   let verifier =
-    typeof verifierOrDuckUserKey === 'string'
-      ? (duckUserKey: string): boolean => verifierOrDuckUserKey === duckUserKey
-      : verifierOrDuckUserKey;
+    typeof verifierOrToken === 'string'
+      ? (token: string): boolean => verifierOrToken === token
+      : verifierOrToken;
 
   return async (ctx, next) => {
     const {headers} = ctx.request;
 
-    let [, duckUserKey] =
-      headers.authorization?.match(/Bearer[\s]*(\S+)[\s]*/) ?? [];
+    let [, token] = headers.authorization?.match(/Bearer[\s]*(\S+)[\s]*/) ?? [];
 
-    if (!duckUserKey || !(await verifier(duckUserKey))) {
-      ctx.throw(403);
+    if (!token || !(await verifier(token))) {
+      ctx.throw(403, 'Unauthorized');
       return;
     }
 
@@ -98,9 +89,35 @@ function auth(verifierOrDuckUserKey: string | DuckUserVerifier): Middleware {
   };
 }
 
-function realIp(): Middleware<undefined, ContextWithParams> {
+function nestGate(): Middleware<undefined, ContextWithParams> {
   return async (ctx, next) => {
-    ctx.realIp = requestIp.getClientIp(ctx.request);
+    let realIp = requestIp.getClientIp(ctx.request);
+    let kinds = JSON.parse(JSON.stringify(ctx.body.kinds));
+
+    if (!realIp || typeof kinds !== 'object' || !Object.keys(kinds).length) {
+      ctx.throw(400, 'Bad Request');
+      return;
+    }
+
+    let formattedKinds: Record<string, unknown> = {};
+    let identifier: string[] = [];
+
+    for (let [kind, value] of Object.entries(kinds)) {
+      if (kind.startsWith('_')) {
+        kind = kind.slice(1);
+        formattedKinds[kind] = value;
+        identifier.push(kind);
+      } else {
+        formattedKinds[kind] = value;
+      }
+    }
+
+    formattedKinds['ip'] = realIp;
+    identifier.push('ip');
+
+    ctx.kinds = kinds;
+    ctx.identifier = identifier;
+
     await next();
   };
 }
