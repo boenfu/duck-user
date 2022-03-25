@@ -14,7 +14,7 @@ type CompareDecision = (
  * @param cd decision function
  * @returns boolean
  */
-function compareKinds(
+export function compareKinds(
   din: DuckAppearance,
   dof: DuckAppearance,
   cd: CompareDecision = (): boolean => true,

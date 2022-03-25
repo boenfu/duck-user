@@ -6,7 +6,7 @@
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
   "scripts": {
-    "test-run": "nodemand ./bld/test/index.js"
+    "dev": "nodemand ./bld/test/index.js"
   },
   "dependencies": {
     "@koa/cors": "^3.2.0",
@@ -27,6 +27,7 @@
     "tslib": "^2.3.1"
   },
   "devDependencies": {
+    "mongodb": "^4.4.1",
     "nodemand": "^0.1.11"
   }
 }

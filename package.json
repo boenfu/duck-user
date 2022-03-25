@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "lint-prettier": "prettier --check .",
     "test": "yarn lint-prettier && yarn build && yarn lint",
+    "web": "yarn workspace @duck-user/web",
     "server": "yarn workspace @duck-user/server",
     "lerna:publish": "lerna publish patch --npm-tag latest --registry=https://registry.npmjs.org",
     "prepublishOnly": "yarn test"

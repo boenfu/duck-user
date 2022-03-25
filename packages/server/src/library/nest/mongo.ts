@@ -3,6 +3,7 @@ import {Collection, Db, ObjectId} from 'mongodb';
 
 import {Duck, DuckAppearance} from '../duck';
 
+import {compareKinds, strictCompareKinds} from './@utils';
 import {INest} from './nest';
 
 export interface MongoDuck extends Duck {
@@ -22,11 +23,30 @@ export class MongoNest implements INest {
   }
 
   async get(appearance: DuckAppearance): Promise<Duck | undefined> {
-    this.collection.find({
-      $or: Object.entries(appearance.identifier).map(entry =>
-        Object.fromEntries([entry]),
-      ),
-    });
+    for await (let _duck of this.collection.find({
+      $and: [
+        {
+          diedAt: {
+            $gt: Date.now(),
+          },
+        },
+        {
+          $or: Object.entries(appearance.identifier).map(entry =>
+            Object.fromEntries([entry]),
+          ),
+        },
+      ],
+    })) {
+      if (_duck.touched) {
+        if (strictCompareKinds(_duck, appearance)) {
+          return _duck;
+        }
+      } else if (compareKinds(_duck, appearance)) {
+        await this.collection.updateOne(_duck, {$set: {touched: true}});
+
+        return _duck;
+      }
+    }
 
     return undefined;
   }

@@ -7,7 +7,7 @@ export interface DuckUserOptions {
 }
 
 export interface DuckUserExtraKinds {
-  _clipboard: string;
+  _clipboard: string | undefined;
 }
 
 export class DuckUser<TData = any> {

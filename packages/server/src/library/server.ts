@@ -59,12 +59,14 @@ export class DuckUserServer {
     }
 
     router
-      .post('/get', ({identifier, kinds}) => nest.get({identifier, kinds}))
-      .post('/set', ({body, identifier, kinds}) =>
+      .post('/get', ({identifier, kinds}) =>
+        Promise.resolve(nest.get({identifier, kinds})).then(duck => duck?.meat),
+      )
+      .post('/set', ({request, identifier, kinds}) =>
         nest.set({
           identifier,
           kinds,
-          meat: body.data,
+          meat: request.body.data,
           hatchedAt: Date.now(),
           diedAt: Date.now() + defaultLifespan,
         }),
@@ -107,7 +109,8 @@ function auth(verifierOrToken: string | DuckUserVerifier): Middleware {
 function nestGate(): Middleware<undefined, ContextWithParams> {
   return async (ctx, next) => {
     let realIp = requestIp.getClientIp(ctx.request);
-    let kinds = JSON.parse(JSON.stringify(ctx.body.kinds));
+
+    let kinds = JSON.parse(JSON.stringify(ctx.request.body.kinds));
 
     if (!realIp || typeof kinds !== 'object' || !Object.keys(kinds).length) {
       ctx.throw(400, 'Bad Request');
@@ -135,6 +138,6 @@ function nestGate(): Middleware<undefined, ContextWithParams> {
     ctx.kinds = kinds;
     ctx.identifier = identifier;
 
-    await next();
+    ctx.body = (await next()) ?? {};
   };
 }
