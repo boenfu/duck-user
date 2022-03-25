@@ -1,8 +1,8 @@
-import {MobileDeviceIdentifier} from '@duck-user/core';
+import {MobileDeviceKinds} from '@duck-user/core';
 
-import {getColorGamut, getTimezone, getUA} from './utils';
+import {getColorGamut, getTimezone, getUA} from './@utils';
 
-export function getUserIdentifier(): MobileDeviceIdentifier {
+export function getKinds(): MobileDeviceKinds {
   let ua = getUA();
 
   return {

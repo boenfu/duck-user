@@ -1,4 +1,4 @@
-export interface MobileDeviceIdentifier {
+export interface MobileDeviceKinds {
   screenWidth: number | undefined;
   screenHeight: number | undefined;
   colorDepth: number | undefined;

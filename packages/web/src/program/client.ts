@@ -1,20 +1,62 @@
-import {MobileDeviceIdentifier} from '@duck-user/core';
+import {getKinds} from './@kinds';
+import {nanoid, writeClipboard} from './@utils';
 
-import {getUserIdentifier} from './identifier';
-
-export interface DockerUserOptions {
+export interface DuckUserOptions {
   server: string;
   token?: string;
 }
 
-export class DockerUser {
-  private identifier!: MobileDeviceIdentifier;
+export interface DuckUserExtraKinds {
+  _clipboard: string;
+}
 
-  constructor(private options: DockerUserOptions) {
-    this.identifier = getUserIdentifier();
+export class DuckUser<TData = any> {
+  constructor(private options: DuckUserOptions) {}
+
+  async set<TTData = TData>(data: TTData): Promise<void> {
+    let id = nanoid();
+
+    writeClipboard(id);
+
+    await this.request(
+      'set',
+      {
+        ...data,
+      },
+      {
+        _clipboard: id,
+      },
+    );
   }
 
-  async set(): Promise<void> {}
+  async get<TTData = TData>(extraKinds: DuckUserExtraKinds): Promise<TTData> {
+    return this.request<TTData>('get', undefined, extraKinds);
+  }
 
-  async get(): Promise<void> {}
+  private request<T>(
+    path: string,
+    data: any,
+    extraKinds: DuckUserExtraKinds,
+  ): Promise<T> {
+    let {server, token} = this.options;
+
+    return fetch(`${server}/${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+      },
+      body: JSON.stringify({
+        kinds: {
+          ...getKinds(),
+          ...extraKinds,
+        },
+        data,
+      }),
+    }).then(response => response.json());
+  }
 }

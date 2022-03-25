@@ -4,22 +4,24 @@ import cors from '@koa/cors';
 import Koa, {Middleware} from 'koa';
 import body from 'koa-bodyparser';
 import Router from 'koa-router';
+import ms from 'ms';
 import requestIp from 'request-ip';
 
-import {INest, MemoryNest} from './nest';
+import {INest} from './nest';
 
 export const DUCK_USER_PORT_DEFAULT = 3000;
+export const DUCK_USER_LIFESPAN_DEFAULT = ms('20 m');
 
 export type DuckUserVerifier = (nextKey: string) => Promise<boolean> | boolean;
 
 export interface DuckUserServerOptions {
+  nest: INest;
   serve?: {
     httpServer?: HTTPServer;
     koa?: Koa;
     port?: number;
     verifier?: string | DuckUserVerifier;
   };
-  nest?: INest;
   /**
    * (ms)
    */
@@ -28,7 +30,7 @@ export interface DuckUserServerOptions {
 
 interface ContextWithParams {
   kinds: object;
-  identifier: string[];
+  identifier: object;
 }
 
 export class DuckUserServer {
@@ -45,8 +47,9 @@ export class DuckUserServer {
       port = DUCK_USER_PORT_DEFAULT,
       verifier,
     } = {},
-    nest = new MemoryNest(),
-  }: DuckUserServerOptions = {}) {
+    defaultLifespan = DUCK_USER_LIFESPAN_DEFAULT,
+    nest,
+  }: DuckUserServerOptions) {
     let router = this.router;
 
     app.use(cors()).use(body()).use(nestGate());
@@ -54,6 +57,18 @@ export class DuckUserServer {
     if (verifier !== undefined) {
       app.use(auth(verifier));
     }
+
+    router
+      .post('/get', ({identifier, kinds}) => nest.get({identifier, kinds}))
+      .post('/set', ({body, identifier, kinds}) =>
+        nest.set({
+          identifier,
+          kinds,
+          meat: body.data,
+          hatchedAt: Date.now(),
+          diedAt: Date.now() + defaultLifespan,
+        }),
+      );
 
     app.use(router.routes()).use(router.allowedMethods());
 
@@ -100,20 +115,22 @@ function nestGate(): Middleware<undefined, ContextWithParams> {
     }
 
     let formattedKinds: Record<string, unknown> = {};
-    let identifier: string[] = [];
+    let identifier: Record<string, unknown> = {};
 
     for (let [kind, value] of Object.entries(kinds)) {
+      if (value === null) {
+        continue;
+      }
+
       if (kind.startsWith('_')) {
         kind = kind.slice(1);
-        formattedKinds[kind] = value;
-        identifier.push(kind);
+        identifier[kind] = value;
       } else {
         formattedKinds[kind] = value;
       }
     }
 
-    formattedKinds['ip'] = realIp;
-    identifier.push('ip');
+    identifier['ip'] = realIp;
 
     ctx.kinds = kinds;
     ctx.identifier = identifier;

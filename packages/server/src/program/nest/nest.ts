@@ -1,7 +1,7 @@
 import {Duck, DuckAppearance} from '../duck';
 
 export interface INest {
-  bring(duck: Duck): Promise<void> | void;
-  take(appearance: DuckAppearance): Promise<Duck> | Duck;
-  bury(duck: Duck): Promise<void> | void;
+  set(duck: Duck): Promise<void> | void;
+  get(duck: DuckAppearance): Promise<Duck | undefined> | Duck | undefined;
+  destroy?(duck: Duck): Promise<void> | void;
 }
