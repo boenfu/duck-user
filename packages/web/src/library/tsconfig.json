@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["DOM", "ESNext"],
-    "outDir": "../../bld/program"
+    "outDir": "../../bld/library"
   },
   "references": [
     {

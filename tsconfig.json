@@ -7,13 +7,13 @@
       "path": "packages/core/src/test"
     },
     {
-      "path": "packages/server/src/program"
+      "path": "packages/server/src/library"
     },
     {
       "path": "packages/server/src/test"
     },
     {
-      "path": "packages/web/src/program"
+      "path": "packages/web/src/library"
     },
     {
       "path": "packages/web/src/test"

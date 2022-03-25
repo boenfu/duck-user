@@ -20,7 +20,7 @@
         "name": "@duck-user/server",
         "tsProjects": [
           {
-            "name": "program"
+            "name": "library"
           },
           {
             "name": "test"
@@ -31,7 +31,7 @@
         "name": "@duck-user/web",
         "tsProjects": [
           {
-            "name": "program",
+            "name": "library",
             "references": [
               {
                 "package": "@duck-user/core",
