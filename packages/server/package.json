@@ -5,6 +5,9 @@
   "author": "boenfu",
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "nodemand ./bld/test/index.js"
   },
