@@ -7,7 +7,7 @@ export interface DuckUserOptions {
 }
 
 export interface DuckUserExtraKinds {
-  _clipboard: string | undefined;
+  _clipboard?: string;
 }
 
 export class DuckUser<TData = any> {
@@ -29,7 +29,9 @@ export class DuckUser<TData = any> {
     );
   }
 
-  async get<TTData = TData>(extraKinds: DuckUserExtraKinds): Promise<TTData> {
+  async get<TTData = TData>(
+    extraKinds: DuckUserExtraKinds = {},
+  ): Promise<TTData> {
     return this.request<TTData>('get', undefined, extraKinds);
   }
 

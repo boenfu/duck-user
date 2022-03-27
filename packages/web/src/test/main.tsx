@@ -22,11 +22,7 @@ const App: FC = () => {
     }
 
     async function f(): Promise<void> {
-      await duckUser
-        .get({
-          _clipboard: undefined,
-        })
-        .then(setData);
+      await duckUser.get().then(setData);
     }
 
     void f().catch(alert);
