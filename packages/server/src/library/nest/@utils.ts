@@ -27,8 +27,26 @@ export function compareKinds(
     if (ks.has(k)) {
       ks.delete(k);
 
-      if (din.kinds[k] !== v) {
+      let _v = din.kinds[k];
+
+      if (typeof _v !== typeof v) {
         return false;
+      }
+
+      if (_v !== v) {
+        if (Array.isArray(v)) {
+          if (!Array.isArray(_v)) {
+            return false;
+          }
+
+          let m = Math.min(v.length, _v.length);
+
+          if (v.slice(0, m).toString() !== _v.slice(0, m).toString()) {
+            return false;
+          }
+        } else {
+          return false;
+        }
       }
     } else {
       mks.push(k);

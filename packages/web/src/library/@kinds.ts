@@ -15,7 +15,7 @@ export function getKinds(): MobileDeviceKinds {
     deviceModel: ua.device.model,
     deviceVendor: ua.device.vendor,
     osName: ua.os.name,
-    osVersion: ua.os.version,
+    osVersion: ua.os.version?.split('.'),
     // 这两个安卓浏览器才取得到
     hardwareConcurrency: navigator.hardwareConcurrency,
     deviceMemory: navigator.deviceMemory,

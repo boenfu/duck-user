@@ -23,27 +23,29 @@ export class MongoNest implements INest {
   }
 
   async get(appearance: DuckAppearance): Promise<Duck | undefined> {
-    for await (let _duck of this.collection.find({
-      $and: [
-        {
-          diedAt: {
-            $gt: Date.now(),
+    for await (let _duck of this.collection
+      .find({
+        $and: [
+          {
+            diedAt: {
+              $gt: Date.now(),
+            },
           },
-        },
-        {
-          $or: Object.entries(appearance.identifier).map(entry =>
-            Object.fromEntries([entry]),
-          ),
-        },
-      ],
-    })) {
+          {
+            $or: Object.entries(appearance.identifier).map(entry => {
+              entry[0] = `identifier.${entry[0]}`;
+              return Object.fromEntries([entry]);
+            }),
+          },
+        ],
+      })
+      .sort({_id: -1})) {
       if (_duck.touched) {
         if (strictCompareKinds(_duck, appearance)) {
           return _duck;
         }
       } else if (compareKinds(_duck, appearance)) {
         await this.collection.updateOne(_duck, {$set: {touched: true}});
-
         return _duck;
       }
     }

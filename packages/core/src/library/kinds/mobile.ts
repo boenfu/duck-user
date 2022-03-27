@@ -8,7 +8,7 @@ export interface MobileDeviceKinds {
   hardwareConcurrency: number | undefined;
   timezone: string | undefined;
   osName: string | undefined;
-  osVersion: string | undefined;
+  osVersion: string[] | undefined;
   deviceMemory: number | undefined;
   deviceVendor: string | undefined;
   deviceModel: string | undefined;

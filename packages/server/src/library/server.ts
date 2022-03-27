@@ -108,11 +108,11 @@ function auth(verifierOrToken: string | DuckUserVerifier): Middleware {
 
 function nestGate(): Middleware<undefined, ContextWithParams> {
   return async (ctx, next) => {
-    let realIp = requestIp.getClientIp(ctx.request);
+    let ip = requestIp.getClientIp(ctx.request) ?? ctx.request.ip;
 
     let kinds = JSON.parse(JSON.stringify(ctx.request.body.kinds));
 
-    if (!realIp || typeof kinds !== 'object' || !Object.keys(kinds).length) {
+    if (!ip || typeof kinds !== 'object' || !Object.keys(kinds).length) {
       ctx.throw(400, 'Bad Request');
       return;
     }
@@ -133,9 +133,9 @@ function nestGate(): Middleware<undefined, ContextWithParams> {
       }
     }
 
-    identifier['ip'] = realIp;
+    identifier['ip'] = ip;
 
-    ctx.kinds = kinds;
+    ctx.kinds = formattedKinds;
     ctx.identifier = identifier;
 
     ctx.body = (await next()) ?? {};

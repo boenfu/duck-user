@@ -22,9 +22,6 @@ const App: FC = () => {
     }
 
     async function f(): Promise<void> {
-      // console.log(navigator.clipboard);
-
-      // const text = await navigator.clipboard.readText();
       await duckUser
         .get({
           _clipboard: undefined,
