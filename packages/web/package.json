@@ -13,13 +13,13 @@
     "@types/ua-parser-js": "^0.7.36",
     "nanoid": "^3.3.1",
     "tslib": "^2.3.1",
-    "ua-parser-js": "^1.0.2",
-    "vite": "^2.8.6"
+    "ua-parser-js": "^1.0.2"
   },
   "devDependencies": {
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "vite": "^2.8.6"
   }
 }

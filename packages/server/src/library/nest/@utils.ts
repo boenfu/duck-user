@@ -1,8 +1,6 @@
-import hash from 'object-hash';
-
 import {DuckAppearance} from '../duck';
 
-type CompareDecision = (
+export type CompareDecision = (
   dinMissingKinds: string[],
   dofMissingKinds: string[],
 ) => boolean;
@@ -67,12 +65,4 @@ export function strictCompareKinds(
   dof: DuckAppearance,
 ): boolean {
   return compareKinds(din, dof, k => !k.length);
-}
-
-export function hashDuck(duck: DuckAppearance): string | undefined {
-  if (Object.keys(duck.identifier).length <= 1) {
-    return undefined;
-  }
-
-  return hash(duck.identifier);
 }

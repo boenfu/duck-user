@@ -1,5 +1,4 @@
 import {defineConfig} from 'vite';
-import {viteCommonjs} from '@originjs/vite-plugin-commonjs';
 
 export default defineConfig(async () => {
   return {
@@ -7,6 +6,5 @@ export default defineConfig(async () => {
     server: {
       port: 3030,
     },
-    plugins: [viteCommonjs()],
   };
 });

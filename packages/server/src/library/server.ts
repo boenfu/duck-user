@@ -7,6 +7,7 @@ import Router from 'koa-router';
 import ms from 'ms';
 import requestIp from 'request-ip';
 
+import {DuckAppearance} from './duck';
 import {INest} from './nest';
 
 export const DUCK_USER_PORT_DEFAULT = 3000;
@@ -29,8 +30,7 @@ export interface DuckUserServerOptions {
 }
 
 interface ContextWithParams {
-  kinds: object;
-  identifier: object;
+  appearance: DuckAppearance;
 }
 
 export class DuckUserServer {
@@ -59,13 +59,12 @@ export class DuckUserServer {
     }
 
     router
-      .post('/get', ({identifier, kinds}) =>
-        Promise.resolve(nest.get({identifier, kinds})).then(duck => duck?.meat),
+      .post('/get', ({appearance}) =>
+        Promise.resolve(nest.get(appearance)).then(duck => duck?.meat),
       )
-      .post('/set', ({request, identifier, kinds}) =>
+      .post('/set', ({request, appearance}) =>
         nest.set({
-          identifier,
-          kinds,
+          ...appearance,
           meat: request.body.data,
           hatchedAt: Date.now(),
           diedAt: Date.now() + defaultLifespan,
@@ -108,11 +107,18 @@ function auth(verifierOrToken: string | DuckUserVerifier): Middleware {
 
 function nestGate(): Middleware<undefined, ContextWithParams> {
   return async (ctx, next) => {
-    let ip = requestIp.getClientIp(ctx.request) ?? ctx.request.ip;
+    let kinds: object = {};
+    let ip!: string;
 
-    let kinds = JSON.parse(JSON.stringify(ctx.request.body.kinds));
+    try {
+      ip = requestIp.getClientIp(ctx.request) ?? ctx.request.ip;
 
-    if (!ip || typeof kinds !== 'object' || !Object.keys(kinds).length) {
+      kinds = JSON.parse(JSON.stringify(ctx.request.body.kinds));
+
+      if (!ip || typeof kinds !== 'object' || !Object.keys(kinds).length) {
+        throw Error();
+      }
+    } catch (error) {
       ctx.throw(400, 'Bad Request');
       return;
     }
@@ -135,8 +141,10 @@ function nestGate(): Middleware<undefined, ContextWithParams> {
 
     identifier['ip'] = ip;
 
-    ctx.kinds = formattedKinds;
-    ctx.identifier = identifier;
+    ctx.appearance = {
+      identifier,
+      kinds: formattedKinds,
+    };
 
     ctx.body = (await next()) ?? {};
   };
