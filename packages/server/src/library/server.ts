@@ -2,7 +2,7 @@ import cors from '@koa/cors';
 import Koa, {Middleware} from 'koa';
 import body from 'koa-bodyparser';
 import mount from 'koa-mount';
-import Router from 'koa-router';
+import Router, {IMiddleware} from 'koa-router';
 import ms from 'ms';
 
 import {KoaContextWithDuckAppearance} from './context';
@@ -18,6 +18,7 @@ export interface DuckUserServerOptions {
     koa?: Koa;
     port?: number;
     verifier?: string | DuckUserVerifier;
+    middleware?: IMiddleware<undefined, KoaContextWithDuckAppearance>[];
   };
   /**
    * (ms)
@@ -36,7 +37,7 @@ export class DuckUserServer {
   };
 
   constructor({
-    serve: {port = DUCK_USER_PORT_DEFAULT, verifier} = {},
+    serve: {port = DUCK_USER_PORT_DEFAULT, verifier, middleware = []} = {},
     defaultLifespan = DUCK_USER_LIFESPAN_DEFAULT,
     nest,
   }: DuckUserServerOptions) {
@@ -50,10 +51,10 @@ export class DuckUserServer {
     }
 
     router
-      .post('/get', ({appearance}) =>
+      .post('/get', ...middleware, ({appearance}) =>
         Promise.resolve(nest.get(appearance)).then(duck => duck?.meat),
       )
-      .post('/set', ({request, appearance}) =>
+      .post('/set', ...middleware, ({request, appearance}) =>
         nest.set({
           ...appearance,
           meat: request.body.data,
