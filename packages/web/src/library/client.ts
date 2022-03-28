@@ -1,9 +1,12 @@
-import {getKinds} from './@kinds';
+import {MobileDeviceKindsOptions, getKinds} from './@kinds';
 import {nanoid, writeClipboard} from './@utils';
+
+export interface DuckUserEnv extends MobileDeviceKindsOptions {}
 
 export interface DuckUserOptions {
   server: string;
   token?: string;
+  env?: DuckUserEnv;
 }
 
 export interface DuckUserExtraKinds {
@@ -40,7 +43,7 @@ export class DuckUser<TData = any> {
     data: any,
     extraKinds: DuckUserExtraKinds,
   ): Promise<T> {
-    let {server, token} = this.options;
+    let {server, token, env} = this.options;
 
     return fetch(`${server}/${path}`, {
       method: 'POST',
@@ -54,7 +57,7 @@ export class DuckUser<TData = any> {
       },
       body: JSON.stringify({
         kinds: {
-          ...getKinds(),
+          ...getKinds(env),
           ...extraKinds,
         },
         data,

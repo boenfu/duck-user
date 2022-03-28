@@ -2,12 +2,28 @@ import {MobileDeviceKinds} from '@duck-user/core';
 
 import {getColorGamut, getTimezone, getUA} from './@utils';
 
-export function getKinds(): MobileDeviceKinds {
+export interface MobileDeviceKindsOptions {
+  /**
+   * ignore screenWidth & screenHeight in Wechat
+   */
+  inWechat?: boolean;
+}
+
+export function getKinds({
+  inWechat,
+}: MobileDeviceKindsOptions = {}): MobileDeviceKinds {
   let ua = getUA();
 
   return {
-    screenWidth: screen.width,
-    screenHeight: screen.height,
+    ...(!inWechat
+      ? {
+          screenWidth: screen.width,
+          screenHeight: screen.height,
+        }
+      : {
+          screenWidth: undefined,
+          screenHeight: undefined,
+        }),
     colorDepth: screen.colorDepth,
     maxTouchPoints: navigator.maxTouchPoints,
     colorGamut: getColorGamut(),
