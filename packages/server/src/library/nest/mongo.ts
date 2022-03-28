@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {Collection, Db, ObjectId} from 'mongodb';
+import {Collection, Db, Filter, ObjectId} from 'mongodb';
 
 import {Duck, DuckAppearance} from '../duck';
 
-import {compareKinds, strictCompareKinds} from './@utils';
+import {compareKinds} from './@utils';
 import {INest} from './nest';
 
 export interface MongoDuck extends Duck {
@@ -23,33 +23,107 @@ export class MongoNest implements INest {
   }
 
   async get(appearance: DuckAppearance): Promise<Duck | undefined> {
-    for await (let _duck of this.collection
-      .find({
-        $and: [
-          {
-            diedAt: {
-              $gt: Date.now(),
-            },
+    let diedQuery: Filter<MongoDuck> = {
+      diedAt: {
+        $gt: Date.now(),
+      },
+    };
+
+    let sorter = {
+      $sort: {
+        _id: -1,
+        touched: 1,
+      },
+    };
+
+    let {allMatched, matched} = (await this.collection
+      .aggregate<{
+        allMatched: MongoDuck[];
+        matched: MongoDuck[];
+      }>([
+        {
+          $facet: {
+            ...(Object.keys(appearance.identifier).length > 1
+              ? {
+                  allMatched: [
+                    {
+                      $match: {
+                        ...diedQuery,
+                        identifier: appearance.identifier,
+                      },
+                    },
+                    sorter,
+                  ],
+                }
+              : {}),
+            matched: [
+              {
+                $match: {
+                  $and: [
+                    diedQuery,
+                    {
+                      $or: Object.entries(appearance.identifier).map(entry => {
+                        entry[0] = `identifier.${entry[0]}`;
+                        return Object.fromEntries([entry]);
+                      }),
+                    },
+                  ],
+                },
+              },
+              sorter,
+            ],
           },
-          {
-            $or: Object.entries(appearance.identifier).map(entry => {
-              entry[0] = `identifier.${entry[0]}`;
-              return Object.fromEntries([entry]);
-            }),
-          },
-        ],
-      })
-      .sort({_id: -1})) {
-      if (_duck.touched) {
-        if (strictCompareKinds(_duck, appearance)) {
-          return _duck;
-        }
-      } else if (compareKinds(_duck, appearance)) {
-        await this.collection.updateOne(_duck, {$set: {touched: true}});
-        return _duck;
+        },
+      ])
+      .next())!;
+
+    let targetDuck: Duck | undefined;
+
+    if (allMatched?.length) {
+      if (compareKinds(allMatched[0], appearance)) {
+        targetDuck = allMatched[0];
+      }
+    } else if (matched?.length) {
+      let {duck, score} = matched
+        .map((_duck, index, arr) => {
+          let base = arr.length - index;
+
+          if (
+            !compareKinds(_duck, appearance, mks => {
+              base = Math.max(base - mks.length, 0);
+              return true;
+            })
+          ) {
+            return {
+              duck: _duck,
+              score: -1,
+            };
+          }
+
+          if (_duck.touched) {
+            base *= 0.1;
+          }
+
+          return {
+            duck: _duck,
+            score: base,
+          };
+        })
+        .sort((a, b) => b.score - a.score)[0];
+
+      if (score >= 0) {
+        targetDuck = duck;
       }
     }
 
-    return undefined;
+    if (targetDuck) {
+      await this.collection.updateOne(targetDuck, {
+        $set: {
+          touched: true,
+        },
+      });
+    }
+
+    return targetDuck;
   }
 }
