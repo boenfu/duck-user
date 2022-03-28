@@ -47,6 +47,6 @@ export function nestGate(): Middleware<
       kinds: formattedKinds,
     };
 
-    ctx.body = (await next()) ?? {};
+    await next();
   };
 }

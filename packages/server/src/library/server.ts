@@ -51,16 +51,24 @@ export class DuckUserServer {
     }
 
     router
-      .post('/get', ...middleware, ({appearance}) =>
-        Promise.resolve(nest.get(appearance)).then(duck => duck?.meat),
+      .post(
+        '/get',
+        ...middleware,
+        response(({appearance}) =>
+          Promise.resolve(nest.get(appearance)).then(duck => duck?.meat),
+        ),
       )
-      .post('/set', ...middleware, ({request, appearance}) =>
-        nest.set({
-          ...appearance,
-          meat: request.body.data,
-          hatchedAt: Date.now(),
-          diedAt: Date.now() + defaultLifespan,
-        }),
+      .post(
+        '/set',
+        ...middleware,
+        response(({request, appearance}) =>
+          nest.set({
+            ...appearance,
+            meat: request.body.data,
+            hatchedAt: Date.now(),
+            diedAt: Date.now() + defaultLifespan,
+          }),
+        ),
       );
 
     app.use(router.routes()).use(router.allowedMethods());
@@ -83,4 +91,12 @@ export class DuckUserServer {
   ): Middleware<undefined, KoaContextWithDuckAppearance> {
     return mount(path, new DuckUserServer(options).app);
   }
+}
+
+function response(
+  fn: Middleware<undefined, KoaContextWithDuckAppearance>,
+): Middleware<undefined, KoaContextWithDuckAppearance> {
+  return async (ctx, ...args) => {
+    ctx.body = (await fn(ctx, ...args)) ?? {};
+  };
 }
