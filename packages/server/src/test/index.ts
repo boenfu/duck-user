@@ -11,5 +11,5 @@ import {DuckUserServer, MongoNest} from '../../bld/library';
 
   new DuckUserServer({
     nest: new MongoNest(db, 'duck'),
-  });
+  }).start();
 })().catch(console.error);

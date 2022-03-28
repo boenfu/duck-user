@@ -21,9 +21,11 @@ let client = await MongoClient.connect('mongodb://localhost:27017');
 
 let db = client.db('#your db name');
 
-new DuckUserServer({
+let server = new DuckUserServer({
   nest: new MongoNest(db, '#your collection name'),
 });
+
+server.start(3000);
 ```
 
 ## Browser Client
