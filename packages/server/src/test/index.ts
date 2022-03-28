@@ -10,6 +10,6 @@ import {DuckUserServer, MongoNest} from '../../bld/library';
   let db = client.db('duck-user');
 
   new DuckUserServer({
-    nest: new MongoNest(db, 'duck'),
+    nest: new MongoNest(db, 'ducks'),
   }).start();
 })().catch(console.error);

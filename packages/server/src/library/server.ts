@@ -70,7 +70,7 @@ export class DuckUserServer {
     };
   }
 
-  async start(port = this.options.port): Promise<void> {
+  start(port = this.options.port): void {
     this.app.listen(port, () => {
       console.info(`duck user server listening on port ${port}`);
     });
