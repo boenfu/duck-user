@@ -1,6 +1,6 @@
 {
   "name": "@duck-user/web",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "author": "boenfu",
   "main": "bld/library/index.js",
@@ -12,7 +12,7 @@
     "dev": "vite -c src/test/vite.config.js --host"
   },
   "dependencies": {
-    "@duck-user/core": "^0.1.4",
+    "@duck-user/core": "^0.1.5",
     "@types/ua-parser-js": "^0.7.36",
     "nanoid": "^3.3.1",
     "tslib": "^2.3.1",
