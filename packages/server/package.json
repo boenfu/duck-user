@@ -1,6 +1,6 @@
 {
   "name": "@duck-user/server",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "license": "MIT",
   "author": "boenfu",
   "main": "bld/library/index.js",
