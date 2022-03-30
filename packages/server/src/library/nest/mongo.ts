@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {Collection, Db, Filter, ObjectId} from 'mongodb';
 
 import {Duck, DuckAppearance} from '../duck';
