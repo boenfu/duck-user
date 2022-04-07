@@ -1,4 +1,4 @@
-export function writeClipboard(text: string): boolean {
+function writeClipboard(text: string): boolean {
   const d = document;
 
   try {
@@ -21,3 +21,7 @@ export function writeClipboard(text: string): boolean {
     return false;
   }
 }
+
+export const Utils = {
+  writeClipboard,
+};

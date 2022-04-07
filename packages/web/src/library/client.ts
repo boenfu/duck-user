@@ -1,5 +1,5 @@
 import {MobileDeviceKindsOptions, getKinds} from './@kinds';
-import {nanoid, writeClipboard} from './@utils';
+import {nanoid} from './@utils';
 
 export interface DuckUserEnv extends MobileDeviceKindsOptions {}
 
@@ -10,16 +10,14 @@ export interface DuckUserOptions {
 }
 
 export interface DuckUserExtraKinds {
-  _clipboard?: string;
+  _nanoid?: string;
 }
 
 export class DuckUser<TData = any> {
   constructor(private options: DuckUserOptions) {}
 
-  async set<TTData = TData>(data: TTData): Promise<void> {
+  async set<TTData = TData>(data: TTData): Promise<string> {
     let id = nanoid();
-
-    writeClipboard(id);
 
     await this.request(
       'set',
@@ -27,9 +25,11 @@ export class DuckUser<TData = any> {
         ...data,
       },
       {
-        _clipboard: id,
+        _nanoid: id,
       },
     );
+
+    return id;
   }
 
   async get<TTData = TData>(
